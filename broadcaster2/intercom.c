@@ -15,7 +15,8 @@ int broadcastInfo(int socket, unsigned char* walls, unsigned char* ceiling, char
 	memcpy(pom, message, 536);
 	
 	printInfoMessage((MessageHead*)data, (InfoMessage*)pom);
-
+	
+	hostToNetInfo((MessageHead*)data, (InfoMessage*)pom);
 	int r = broadcast(socket, data, sizeof(MessageHead) + sizeof(InfoMessage));
 	
 	free(data);
@@ -31,9 +32,11 @@ int sendEdit(int socket, unsigned char* walls, unsigned char* ceiling, char* ip)
 	memcpy(data, head, 12);
 	void* pom = ((MessageHead*)data + 1);
 	memcpy(pom, message, sizeof(EditMessage));
-	
+	printf("-------------------SENDING---------------\n");
 	printEditMessage((MessageHead*)data, (EditMessage*)pom);
-
+	printf("-----------------------------------------\n");
+	
+	hostToNetEdit((MessageHead*)data, (EditMessage*)pom);
 	int r = sendBytes(socket, data, ip,sizeof(MessageHead) + sizeof(InfoMessage));
 	
 	free(data);
@@ -41,6 +44,48 @@ int sendEdit(int socket, unsigned char* walls, unsigned char* ceiling, char* ip)
 	free(head);
 
 	return r;
+}
+
+AreaInfo* sortAreaByName(AreaInfo* area){
+	char* temp = (char*)calloc(16, sizeof(char));
+	char** labels = calloc(area->size, sizeof(char*));
+	
+	for(int i = 0;i<area->size;i++){
+		labels[i] = area->messages[i]->text;
+	}
+	
+	
+	for(int i=0; i < area->size ; i++){
+        for(int j=i+1; j< area->size; j++)
+        {
+            if(strcmp(labels[i], labels[j]) > 0)
+            {
+                strcpy(temp,labels[i]);
+                strcpy(labels[i],labels[j]);
+                strcpy(labels[j],temp);
+            }
+        }
+    }
+    
+    
+    AreaInfo* sortedArea = calloc(1, sizeof(AreaInfo));
+    sortedArea->size = area->size;
+    sortedArea->messages = calloc(sortedArea->size, sizeof(InfoMessage*));
+    sortedArea->heads = calloc(sortedArea->size, sizeof(MessageHead*));
+    sortedArea->ips = calloc(sortedArea->size, sizeof(char*));
+    
+    for(int i = 0;i<sortedArea->size;i++){
+		for(int j = 0;j<area->size;j++){
+			if(strcmp(labels[i], area->messages[j]->text) == 0){
+				sortedArea->messages[i] = area->messages[j];
+				sortedArea->heads[i] = area->heads[j];
+				sortedArea->ips[i] = area->ips[j];
+				break;
+			}
+		}
+	}
+	
+	return sortedArea;
 }
 
 
@@ -59,8 +104,11 @@ AreaInfo* getBroadcasters(int socket, int numOfMessages){
 			MessageHead* head = (MessageHead*) bytes;
 			void* pom = (void*)(head + 1);
 			InfoMessage* message = (InfoMessage*)pom;
+			netToHostInfo(head, message);
+			
 			printf("From address %s:\n", ips[i]);
 			printInfoMessage(head, message);
+			
 			incomMes[i] = message;
 			incomHead[i] = head;
 	}

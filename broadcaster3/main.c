@@ -71,16 +71,16 @@ int init(int mzapo){
 	
 	thisCeiling = calloc(3, sizeof(char));
 	thisWalls = calloc(3, sizeof(char));
-	thisText = "bbb";
+	thisText = "ccc";
 	
-	thisWalls[0] = 0;
-	thisWalls[1] = 2;
-	thisWalls[2] = 4;
+	thisWalls[0] = 6;
+	thisWalls[1] = 6;
+	thisWalls[2] = 6;
 	
 	
-	thisCeiling[0] = 4;
-	thisCeiling[1] = 2;
-	thisCeiling[2] = 0;
+	thisCeiling[0] = 6;
+	thisCeiling[1] = 1;
+	thisCeiling[2] = 6;
 	
 	thisImage = malloc(512);
 	

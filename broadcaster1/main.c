@@ -71,7 +71,7 @@ int init(int mzapo){
 	
 	thisCeiling = calloc(3, sizeof(char));
 	thisWalls = calloc(3, sizeof(char));
-	thisText = "type faster";
+	thisText = "aaa";
 	
 	thisWalls[0] = 12;
 	thisWalls[1] = 14;
